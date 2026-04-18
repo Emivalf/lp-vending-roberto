@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treinamento Gratuito de Vending Machines — Roberto Araújo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-blue: #2563c9;
+    --brand-blue-dark: #1b4d9e;
+    --brand-orange: #f8a42d;
+    --brand-orange-hi: #ffb64a;
+    --ink: #0e1424;
+    --ink-soft: #1a2238;
+    --ink-mid: #465270;
+    --paper: #fafaf7;
+    --paper-warm: #f1ede5;
+    --line: #d9d6cd;
+    --success: #1a7f4f;
+    --alert: #b8351c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink);
+    background: var(--paper);
+    overflow-x: hidden;
+  }
+  img { display: block; max-width: 100%; height: auto; }
+
+  .display {
+    font-family: 'Archivo Black', sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+  }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  /* ========== TOP BAR ========== */
+  .top-bar {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .top-bar strong { color: var(--brand-orange); font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+  .top-bar .sep { opacity: 0.3; margin: 0 12px; }
+
+  /* ========== CONTAINER ========== */
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .container-narrow {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ========== HERO — NOVO DESIGN VISUAL ========== */
+  .hero {
+    background: linear-gradient(180deg, var(--ink) 0%, var(--ink-soft) 100%);
+    color: var(--paper);
+    padding: 48px 0 72px;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Grid background decorativa */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at 70% 50%, black 20%, transparent 70%);
+    pointer-events: none;
+  }
+  /* Brilho laranja */
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(248,164,45,0.14) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    gap: 48px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-logo { display: inline-block; margin-bottom: 28px; }
+  .hero-logo img { height: 64px; width: auto; }
+
+  .hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brand-orange);
+    background: rgba(248,164,45,0.12);
+    padding: 8px 14px;
+    border-radius: 4px;
+    margin-bottom: 22px;
+    border: 1px solid rgba(248,164,45,0.25);
+  }
+  .hero-kicker .live-dot {
+    width: 8px; height: 8px;
+    background: #ff4545;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(255,69,69,0.25);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .hero h1 {
+    font-size: clamp(24px, 2.4vw, 34px);
+    line-height: 1.15;
+    margin-bottom: 24px;
+  }
+  .hero h1 .amount {
+    font-style: normal;
+    color: var(--brand-orange);
+    display: inline;
+    white-space: nowrap;
+  }
+  .hero h1 .highlight {
+    font-style: normal;
+    background: linear-gradient(180deg, transparent 60%, rgba(248,164,45,0.35) 60%);
+    padding: 0 2px;
+  }
+  .hero-sub {
+    font-size: 18px;
+    line-height: 1.55;
+    color: rgba(250, 250, 247, 0.82);
+    margin-bottom: 30px;
+    max-width: 580px;
+  }
+  .hero-bullets {
+    list-style: none;
+    margin: 0 0 36px 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .hero-bullets li {
+    font-size: 14px;
+    padding-left: 28px;
+    position: relative;
+    color: rgba(250, 250, 247, 0.85);
+  }
+  .hero-bullets li::before {
+    content: '✓';
+    position: absolute;
+    left: 0; top: -2px;
+    color: var(--brand-orange);
+    font-weight: 800;
+    font-size: 16px;
+  }
+
+  /* CTA Button */
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--brand-orange);
+    color: var(--ink);
+    padding: 19px 32px;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.15), 0 12px 24px rgba(248,164,45,0.22);
+  }
+  .cta-btn:hover {
+    background: var(--brand-orange-hi);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 0 rgba(0,0,0,0.15), 0 16px 32px rgba(248,164,45,0.3);
+  }
+  .cta-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.15), 0 4px 12px rgba(248,164,45,0.22);
+  }
+  .cta-btn .arr { font-size: 20px; transition: transform 0.2s; }
+  .cta-btn:hover .arr { transform: translateX(3px); }
+
+  .hero-dates {
+    margin-top: 20px;
+    font-size: 14px;
+    color: rgba(250, 250, 247, 0.62);
+    font-family: 'IBM Plex Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-dates strong { color: var(--paper); font-weight: 600; }
+
+  /* Hero photo — vending machine */
+  .hero-photo-wrap {
+    position: relative;
+    min-width: 0;
+    width: 100%;
+  }
+  .hero-photo-frame {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(248,164,45,0.2);
+    transform: perspective(1200px) rotateY(-3deg);
+    position: relative;
+    aspect-ratio: 4 / 5;
+    width: 100%;
+    max-width: 520px;
+    margin-left: auto;
+  }
+  .hero-photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Overlay sutil para profundidade */
+  .hero-photo-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(14,20,36,0.25) 100%);
+    pointer-events: none;
+  }
+
+  /* Floating badges */
+  .hero-badge {
+    position: absolute;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 14px 18px;
+    border-radius: 8px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 2;
+    animation: float 4s ease-in-out infinite;
+  }
+  .hero-badge-1 {
+    top: 30px;
+    left: -30px;
+    transform: rotate(-3deg);
+  }
+  .hero-badge-2 {
+    bottom: 60px;
+    right: -20px;
+    transform: rotate(2deg);
+    animation-delay: 1.5s;
+  }
+  .hero-badge .icon {
+    width: 38px; height: 38px;
+    background: var(--brand-orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .hero-badge .text { line-height: 1.25; }
+  .hero-badge .text strong {
+    display: block;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 18px;
+    color: var(--brand-blue);
+    letter-spacing: -0.02em;
+  }
+  .hero-badge .text span {
+    font-size: 11px;
+    color: var(--ink-mid);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+    50% { transform: translateY(-6px) rotate(var(--rot, 0deg)); }
+  }
+  .hero-badge-1 { --rot: -3deg; }
+  .hero-badge-2 { --rot: 2deg; }
+
+  /* ========== STRIP DE CREDIBILIDADE ========== */
+  .cred-strip {
+    background: var(--ink);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 22px 0;
+    color: rgba(250, 250, 247, 0.7);
+    position: relative;
+  }
+  .cred-strip-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+  .cred-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+  }
+  .cred-item .val {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px;
+    color: var(--brand-orange);
+    letter-spacing: -0.01em;
+  }
+  .cred-item .lbl { line-height: 1.25; }
+
+  /* ========== SECTIONS BASE ========== */
+  section.content {
+    padding: 90px 0;
+    position: relative;
+  }
+  section.content.alt { background: var(--paper-warm); }
+  section.content.dark { background: var(--ink); color: var(--paper); }
+
+  .section-kicker {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brand-blue);
+    margin-bottom: 14px;
+  }
+  section.dark .section-kicker { color: var(--brand-orange); }
+
+  .section-title {
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.1;
+    margin-bottom: 20px;
+    max-width: 920px;
+  }
+  .section-lead {
+    font-size: 18px;
+    color: var(--ink-mid);
+    margin-bottom: 40px;
+    max-width: 760px;
+  }
+  section.dark .section-lead { color: rgba(250, 250, 247, 0.7); }
+
+  /* ========== DOBRA 2 — Para quem (com decorações) ========== */
+  .audience-wrap {
+    position: relative;
+    margin-top: 12px;
+  }
+  .audience-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .audience-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 38px 32px 34px;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+  }
+  .audience-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 120px; height: 120px;
+    background: var(--brand-orange);
+    opacity: 0.06;
+    border-radius: 0 0 0 120px;
+  }
+  .audience-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 48px rgba(14,20,36,0.1);
+  }
+  .audience-card .n {
+    display: inline-block;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--brand-orange);
+    margin-bottom: 18px;
+    letter-spacing: -0.03em;
+  }
+  .audience-card h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    line-height: 1.22;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .audience-card p {
+    color: var(--ink-mid);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .audience-conclude {
+    margin-top: 44px;
+    padding: 24px 28px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 8px;
+    font-size: 17px;
+    line-height: 1.5;
+    position: relative;
+    border-left: 4px solid var(--brand-orange);
+  }
+  .audience-conclude strong { color: var(--brand-orange); }
+  .cta-inline-section { text-align: center; margin-top: 48px; }
+
+  /* ========== DOBRA 3 — Benefícios (novo design com foto + lista) ========== */
+  .benefits-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .benefits-list {
+    list-style: none;
+    padding: 0;
+    margin: 32px 0;
+  }
+  .benefits-list li {
+    padding: 16px 0 16px 44px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    font-size: 17px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .benefits-list li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 28px; height: 28px;
+    background: var(--brand-orange);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 4px white, 0 2px 6px rgba(248,164,45,0.4);
+  }
+  .benefits-list li:last-child { border-bottom: none; }
+
+  .learn-list {
+    list-style: none;
+    padding: 0;
+    margin: 28px 0;
+  }
+  .learn-list li {
+    padding: 10px 0 10px 34px;
+    position: relative;
+    font-size: 16px;
+  }
+  .learn-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0; top: 9px;
+    color: var(--success);
+    font-weight: 800;
+    font-size: 18px;
+  }
+
+  .photo-stack {
+    position: relative;
+  }
+  .photo-main {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(14,20,36,0.18);
+    position: relative;
+    aspect-ratio: 4 / 3;
+  }
+  .photo-main img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  /* Borda laranja decorativa */
+  .photo-stack::after {
+    content: '';
+    position: absolute;
+    top: 16px; left: 16px;
+    right: -16px; bottom: -16px;
+    border: 3px solid var(--brand-orange);
+    border-radius: 10px;
+    z-index: -1;
+  }
+  /* Badge sobre a foto */
+  .photo-callout {
+    position: absolute;
+    bottom: 20px; left: 20px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    max-width: 200px;
+    line-height: 1.4;
+    border-left: 3px solid var(--brand-orange);
+  }
+  .photo-callout strong { color: var(--brand-orange); }
+
+  /* ========== DOBRA 4 — Obstáculos ========== */
+  .blocks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .block-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--brand-blue);
+    border-radius: 6px;
+    padding: 30px 26px;
+    position: relative;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .block-card:hover {
+    transform: translateX(3px);
+    border-left-color: var(--brand-orange);
+  }
+  .block-card .idx {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brand-blue);
+    margin-bottom: 14px;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .block-card .idx::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--brand-blue);
+    border-radius: 50%;
+  }
+  .block-card h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    line-height: 1.28;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  .block-card p {
+    color: var(--ink-mid);
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+
+  /* Faixa com foto dobra 4 */
+  .obstacles-footer {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .obstacles-footer h3 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 26px;
+    line-height: 1.12;
+    margin-bottom: 14px;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .obstacles-footer p {
+    color: var(--ink-mid);
+    font-size: 16px;
+    line-height: 1.55;
+    margin-bottom: 24px;
+  }
+  .obstacles-footer img {
+    border-radius: 6px;
+    box-shadow: 0 20px 40px rgba(14,20,36,0.12);
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  /* ========== DOBRA 5 — As 3 aulas (dark com decoração) ========== */
+  section.dark::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at 50% 0%, black 20%, transparent 70%);
+    pointer-events: none;
+  }
+  section.dark > .container { position: relative; z-index: 1; }
+
+  .classes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 22px;
+    margin-top: 44px;
+  }
+  .class-card {
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .class-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(248,164,45,0.3);
+  }
+  .class-header {
+    padding: 24px 26px 20px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .class-num {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px;
+    color: var(--brand-orange);
+    letter-spacing: 0.14em;
+    margin-bottom: 6px;
+  }
+  .class-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: rgba(250, 250, 247, 0.55);
+    margin-bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    background: rgba(248,164,45,0.08);
+    border-radius: 3px;
+    border: 1px solid rgba(248,164,45,0.2);
+  }
+  .class-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    line-height: 1.3;
+    color: var(--paper);
+  }
+  .class-body {
+    padding: 22px 26px 28px;
+  }
+  .class-body ul { list-style: none; padding: 0; }
+  .class-body li {
+    padding: 8px 0 8px 22px;
+    position: relative;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: rgba(250, 250, 247, 0.78);
+  }
+  .class-body li::before {
+    content: '→';
+    position: absolute;
+    left: 0; top: 7px;
+    color: var(--brand-orange);
+    font-weight: 700;
+  }
+
+  /* ========== DOBRA 6 — Por que agora (5 cards) ========== */
+  .why-today {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-top: 44px;
+  }
+  .why-card {
+    background: white;
+    border-radius: 8px;
+    padding: 28px 22px 26px;
+    border-top: 4px solid var(--brand-orange);
+    box-shadow: 0 4px 12px rgba(14,20,36,0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .why-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(14,20,36,0.08);
+  }
+  .why-card .n {
+    display: inline-block;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--brand-blue);
+    margin-bottom: 14px;
+    letter-spacing: -0.02em;
+  }
+  .why-card h4 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 14.5px;
+    line-height: 1.3;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  .why-card p {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-mid);
+  }
+
+  /* ========== DOBRA 7 — Para quem é / não é ========== */
+  .fit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 20px;
+  }
+  .fit-card {
+    padding: 36px 34px 38px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .fit-yes {
+    background: white;
+    border: 2px solid var(--success);
+    box-shadow: 0 8px 24px rgba(26,127,79,0.06);
+  }
+  .fit-no {
+    background: #faf5f4;
+    border: 2px solid rgba(184,53,28,0.22);
+  }
+  .fit-card .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  .fit-yes .badge {
+    background: rgba(26,127,79,0.1);
+    color: var(--success);
+  }
+  .fit-no .badge {
+    background: rgba(184,53,28,0.08);
+    color: var(--alert);
+  }
+  .fit-card h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    margin-bottom: 22px;
+    line-height: 1.2;
+  }
+  .fit-card ul { list-style: none; padding: 0; }
+  .fit-card li {
+    padding: 13px 0 13px 32px;
+    position: relative;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    border-bottom: 1px solid rgba(14,20,36,0.06);
+  }
+  .fit-card li:last-child { border-bottom: none; }
+  .fit-yes li::before {
+    content: '✓';
+    position: absolute; left: 0; top: 13px;
+    color: var(--success);
+    font-weight: 800;
+    font-size: 16px;
+  }
+  .fit-no li::before {
+    content: '✕';
+    position: absolute; left: 0; top: 13px;
+    color: var(--alert);
+    font-weight: 800;
+    font-size: 16px;
+  }
+
+  /* ========== DOBRA 8 — Professor ========== */
+  .prof-wrap {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .prof-photo {
+    position: relative;
+  }
+  .prof-photo img {
+    border-radius: 10px;
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+  }
+  .prof-photo::before {
+    content: '';
+    position: absolute;
+    top: -16px; left: -16px;
+    right: 16px; bottom: 16px;
+    border: 3px solid var(--brand-orange);
+    border-radius: 10px;
+    z-index: -1;
+  }
+  .prof-tag {
+    position: absolute;
+    bottom: 24px; left: 24px;
+    background: var(--brand-orange);
+    color: var(--ink);
+    padding: 10px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: 4px;
+  }
+  .prof-intro {
+    font-size: 16.5px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+  .prof-intro strong { color: var(--ink); font-weight: 700; }
+  .prof-quote {
+    border-left: 3px solid var(--brand-orange);
+    padding: 10px 0 10px 20px;
+    margin: 24px 0;
+    font-style: italic;
+    color: var(--ink-mid);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  .prof-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .stat .num {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--brand-blue);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .stat .lbl { font-size: 12.5px; color: var(--ink-mid); line-height: 1.4; }
+
+  /* ========== FINAL CTA ========== */
+  .final-cta {
+    background: linear-gradient(135deg, var(--ink) 0%, var(--ink-soft) 100%);
+    color: var(--paper);
+    padding: 100px 0 110px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .final-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 70%);
+    pointer-events: none;
+  }
+  .final-cta::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(248,164,45,0.1) 0%, transparent 65%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .final-cta > * { position: relative; z-index: 1; }
+  .final-cta h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.05;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+  }
+  .final-cta h2 em {
+    font-style: normal;
+    color: var(--brand-orange);
+  }
+  .final-cta p {
+    font-size: 18px;
+    color: rgba(250, 250, 247, 0.78);
+    max-width: 620px;
+    margin: 0 auto 40px;
+  }
+  .final-cta-meta {
+    margin-top: 28px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: rgba(250, 250, 247, 0.55);
+    letter-spacing: 0.05em;
+  }
+
+  /* ========== FORM ========== */
+  .form-card {
+    max-width: 440px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 30px;
+    backdrop-filter: blur(12px);
+  }
+  .form-card .field { margin-bottom: 14px; text-align: left; }
+  .form-card input {
+    width: 100%;
+    padding: 15px 17px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+    color: var(--paper);
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 15px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .form-card input:focus {
+    outline: none;
+    border-color: var(--brand-orange);
+    background: rgba(255,255,255,0.1);
+  }
+  .form-card input::placeholder { color: rgba(250, 250, 247, 0.4); }
+  .form-card .cta-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+    padding: 18px 30px;
+  }
+  .form-card .safe {
+    font-size: 11.5px;
+    color: rgba(250, 250, 247, 0.45);
+    margin-top: 14px;
+    text-align: center;
+    letter-spacing: 0.03em;
+  }
+
+  /* ========== FOOTER ========== */
+  footer {
+    background: #0a0f1c;
+    color: rgba(250, 250, 247, 0.55);
+    padding: 40px 0;
+    text-align: center;
+    font-size: 13px;
+  }
+  footer img { height: 32px; margin: 0 auto 14px; opacity: 0.9; }
+  footer .legal {
+    max-width: 600px;
+    margin: 12px auto 0;
+    font-size: 11px;
+    color: rgba(250, 250, 247, 0.35);
+    line-height: 1.5;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 960px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .hero-bullets { grid-template-columns: 1fr; }
+    .hero-badge-1 { left: 10px; top: 15px; }
+    .hero-badge-2 { right: 10px; bottom: 15px; }
+    .benefits-two-col { grid-template-columns: 1fr; gap: 50px; }
+    .classes-grid { grid-template-columns: 1fr; }
+    .blocks-grid { grid-template-columns: 1fr; }
+    .audience-grid { grid-template-columns: 1fr; }
+    .why-today { grid-template-columns: 1fr 1fr; }
+    .fit-grid { grid-template-columns: 1fr; }
+    .prof-wrap { grid-template-columns: 1fr; gap: 40px; }
+    .prof-stats { grid-template-columns: 1fr 1fr; }
+    .obstacles-footer { grid-template-columns: 1fr; gap: 28px; padding: 32px; }
+    section.content { padding: 64px 0; }
+    .final-cta { padding: 70px 0 80px; }
+    .cred-strip-inner { gap: 16px 24px; justify-content: center; }
+  }
+
+  @media (max-width: 540px) {
+    body { font-size: 16px; }
+    html, body { overflow-x: hidden; max-width: 100vw; }
+    .top-bar { font-size: 11px; padding: 8px 12px; letter-spacing: 0; }
+    .top-bar .sep { display: none; }
+    .top-bar strong { font-size: 11px; }
+    .hero { padding: 28px 0 40px; }
+    .hero-grid { gap: 32px; }
+    .hero-logo img { height: 48px; }
+    .hero-kicker { font-size: 10px; letter-spacing: 0.1em; padding: 6px 10px; max-width: 100%; flex-wrap: wrap; }
+    .hero h1 { font-size: 24px; line-height: 1.18; word-break: normal; overflow-wrap: break-word; hyphens: auto; }
+    .hero h1 .amount { white-space: normal; }
+    .hero-sub { font-size: 15px; }
+    .hero-bullets { grid-template-columns: 1fr; }
+    .hero-bullets li { font-size: 13px; }
+    .hero-badge { display: none; }
+    .hero-photo-frame { transform: none; max-width: 100%; }
+    .why-today { grid-template-columns: 1fr; }
+    .prof-stats { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .cta-btn { padding: 15px 20px; font-size: 13px; width: 100%; justify-content: center; letter-spacing: 0.02em; }
+    .section-title { font-size: 24px; }
+    .container, .container-narrow { padding: 0 16px; }
+    .fit-card { padding: 26px 20px 28px; }
+    .audience-card { padding: 28px 22px 26px; }
+    .class-card { margin: 0 auto; max-width: 100%; }
+    .cred-strip { padding: 18px 0; }
+    .cred-strip-inner { gap: 14px 20px; }
+    .cred-item .val { font-size: 18px; }
+    .cred-item .lbl { font-size: 11.5px; }
+    .obstacles-footer h3 { font-size: 22px; }
+    .cred-item .val { font-size: 18px; }
+    .cred-item { font-size: 12.5px; }
+  }
+
+  /* Fade-in entry */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.7s ease forwards;
+  }
+  .fade-up.d1 { animation-delay: 0.1s; }
+  .fade-up.d2 { animation-delay: 0.25s; }
+  .fade-up.d3 { animation-delay: 0.4s; }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  🔴 INSCRIÇÕES ABERTAS <span class="sep">|</span> 3 aulas gratuitas: <strong>06, 07 e 08 de maio</strong> <span class="sep">|</span> às 19h
+</div>
+
+<!-- ==================== DOBRA 01 — HERO ==================== -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-content fade-up">
+        <div class="hero-logo">
+          <img src="images/logo.png" alt="Roberto Araújo — Vending Machines">
+        </div>
+
+        <span class="hero-kicker">
+          <span class="live-dot"></span>
+          Treinamento gratuito · 3 aulas ao vivo
+        </span>
+
+        <h1>
+          Descubra como <span class="highlight">uma única Vending Machine</span> pode te gerar <span class="amount">R$ 5 mil, R$ 7 mil, R$ 10 mil por mês</span> ou mais — mesmo que você trabalhe o dia todo.
+        </h1>
+
+        <p class="hero-sub">Participe do Treinamento Gratuito de Vending Machines e entenda em 3 aulas como transformar esse modelo de negócio em uma fonte real de renda extra — com uma operação simples, praticamente remota e com alto potencial de escala.</p>
+
+        <ul class="hero-bullets">
+          <li>Mesmo que você nunca tenha empreendido</li>
+          <li>Mesmo que ainda trabalhe CLT</li>
+          <li>Mesmo que não saiba qual máquina comprar</li>
+          <li>Mesmo que não faça ideia de onde instalar</li>
+        </ul>
+
+        <a href="#inscricao" class="cta-btn">QUERO ME INSCREVER <span class="arr">→</span></a>
+        <div class="hero-dates">
+          📅 <strong>06, 07 e 08 de maio</strong> · 19h · online e gratuito
+        </div>
+      </div>
+
+      <div class="hero-photo-wrap fade-up d2">
+        <div class="hero-badge hero-badge-1">
+          <div class="icon">💰</div>
+          <div class="text">
+            <strong>R$ 770k/ano</strong>
+            <span>faturamento real</span>
+          </div>
+        </div>
+        <div class="hero-photo-frame">
+          <img src="images/hero-maquina.jpg" alt="Vending Machine em operação">
+        </div>
+        <div class="hero-badge hero-badge-2">
+          <div class="icon">⚡</div>
+          <div class="text">
+            <strong>Operação remota</strong>
+            <span>sem largar o CLT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STRIP DE CREDIBILIDADE -->
+<div class="cred-strip">
+  <div class="container">
+    <div class="cred-strip-inner">
+      <div class="cred-item">
+        <span class="val">+7</span>
+        <span class="lbl">anos<br>de operação</span>
+      </div>
+      <div class="cred-item">
+        <span class="val">2</span>
+        <span class="lbl">capitais<br>atendidas</span>
+      </div>
+      <div class="cred-item">
+        <span class="val">+R$770k</span>
+        <span class="lbl">faturamento<br>anual</span>
+      </div>
+      <div class="cred-item">
+        <span class="val">CLT</span>
+        <span class="lbl">sem largar<br>o emprego</span>
+      </div>
+      <div class="cred-item">
+        <span class="val">100%</span>
+        <span class="lbl">online<br>e gratuito</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DOBRA 02 — PARA QUEM É ==================== -->
+<section class="content">
+  <div class="container">
+    <span class="section-kicker">ISSO É PARA VOCÊ</span>
+    <h2 class="section-title display">Aumentar sua renda sem entrar em um negócio que suga sua vida — e sem largar seu emprego.</h2>
+    <p class="section-lead">Talvez você esteja em um destes dois grupos:</p>
+
+    <div class="audience-wrap">
+      <div class="audience-grid">
+        <div class="audience-card">
+          <span class="n">01</span>
+          <h3>Você trabalha, tem uma rotina puxada e quer uma renda extra de verdade</h3>
+          <p>Você quer ganhar mais, mas não pode largar o emprego, nem entrar em algo que dependa da sua presença o dia inteiro.</p>
+        </div>
+        <div class="audience-card">
+          <span class="n">02</span>
+          <h3>Você já tem o perfil de investidor e busca um negócio simples de operar e fácil de escalar</h3>
+          <p>Você já entendeu que existem modelos melhores do que franquias caras, operações engessadas e negócios que exigem equipe grande logo no início.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="audience-conclude">
+      Se você se encaixa em um desses dois perfis, existe uma <strong>grande chance</strong> de que o mercado de vending machines faça muito mais sentido para você do que imagina.
+    </div>
+
+    <div class="cta-inline-section">
+      <a href="#inscricao" class="cta-btn">GARANTIR MINHA VAGA AGORA <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DOBRA 03 — BENEFÍCIOS ==================== -->
+<section class="content alt">
+  <div class="container">
+    <div class="benefits-two-col">
+      <div>
+        <span class="section-kicker">O QUE ATRAI NESSE MERCADO</span>
+        <h2 class="section-title display">O mercado de vending machines une o que quase todo iniciante procura.</h2>
+        <ul class="benefits-list">
+          <li>Investimento menor que muitos modelos tradicionais</li>
+          <li>Operação simples — sem funcionários</li>
+          <li>Possibilidade de escalar com mais de uma máquina</li>
+          <li>Gestão à distância</li>
+          <li>Liberdade para começar sem abandonar sua ocupação</li>
+        </ul>
+        <p style="color: var(--ink-mid); font-size: 15.5px; line-height: 1.6; margin-bottom: 28px;">
+          E o melhor: você não precisa inventar moda, abrir um mercadinho, pagar taxa de franquia ou montar uma estrutura gigantesca para começar.
+        </p>
+
+        <h3 style="font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 20px; margin-bottom: 14px;">Nas aulas de 06, 07 e 08 de maio, você vai aprender rapidamente:</h3>
+        <ul class="learn-list">
+          <li>Como esse mercado funciona de verdade</li>
+          <li>Quanto custa começar</li>
+          <li>Quanto uma máquina pode faturar</li>
+          <li>Em quanto tempo o investimento pode se pagar</li>
+          <li>Como operar esse negócio da forma certa desde o início</li>
+        </ul>
+        <a href="#inscricao" class="cta-btn" style="margin-top: 20px;">ME INSCREVER AGORA <span class="arr">→</span></a>
+      </div>
+
+      <div class="photo-stack">
+        <div class="photo-main">
+          <img src="images/maquina-hospital.jpg" alt="Vending machine iluminada, totalmente abastecida">
+        </div>
+        <div class="photo-callout">
+          <strong>OPERAÇÃO REAL</strong><br>
+          Máquinas ativas em hospitais, condomínios, academias e órgãos públicos.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DOBRA 04 — OBSTÁCULOS ==================== -->
+<section class="content">
+  <div class="container">
+    <span class="section-kicker">POR QUE A MAIORIA TRAVA</span>
+    <h2 class="section-title display">Muita gente se interessa, mas trava antes da primeira decisão.</h2>
+    <p class="section-lead">E isso acontece por razões bem concretas:</p>
+
+    <div class="blocks-grid">
+      <div class="block-card">
+        <div class="idx">PROBLEMA 01</div>
+        <h3>Sem o conhecimento certo, escolher máquina e ponto parece um tiro no escuro</h3>
+        <p>O mercado tem variáveis importantes. Sem critério, tudo parece arriscado.</p>
+      </div>
+      <div class="block-card">
+        <div class="idx">PROBLEMA 02</div>
+        <h3>Ninguém te ensinou como encontrar e negociar bons pontos</h3>
+        <p>E sem ponto, não existe operação. Essa é uma das partes que mais travam quem quer começar.</p>
+      </div>
+      <div class="block-card">
+        <div class="idx">PROBLEMA 03</div>
+        <h3>Muita gente acha que franquia é "mais seguro", mas acaba pagando caro</h3>
+        <p>No fim, o risco continua existindo — só que com uma conta mais alta.</p>
+      </div>
+      <div class="block-card">
+        <div class="idx">PROBLEMA 04</div>
+        <h3>Faltava uma explicação clara, prática e acessível sobre como operar vending no Brasil</h3>
+        <p>E é exatamente isso que o Roberto vai entregar nesse treinamento gratuito.</p>
+      </div>
+    </div>
+
+    <!-- Faixa de transição com foto -->
+    <div class="obstacles-footer">
+      <div>
+        <h3>Um negócio físico — com logística real, contratos reais, operação real.</h3>
+        <p>É exatamente por ser um negócio de verdade que vending machines dá retorno de verdade. E é por isso que começar do jeito certo faz tanta diferença nos primeiros 90 dias.</p>
+        <a href="#inscricao" class="cta-btn">QUERO ME INSCREVER <span class="arr">→</span></a>
+      </div>
+      <img src="images/instalacao-maquina.jpg" alt="Instalação de vending machine">
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DOBRA 05 — AS 3 AULAS ==================== -->
+<section class="content dark">
+  <div class="container">
+    <span class="section-kicker">AS 3 AULAS AO VIVO</span>
+    <h2 class="section-title display" style="color: var(--paper);">Em 3 aulas gratuitas, você vai enxergar a oportunidade com clareza.</h2>
+    <p class="section-lead">Esse treinamento foi desenhado para te mostrar, de forma simples e prática, como funciona o negócio de vending machines no mundo real.</p>
+
+    <div class="classes-grid">
+      <div class="class-card">
+        <div class="class-header">
+          <div class="class-num">AULA 01</div>
+          <div class="class-date">📅 Terça · 06 MAI · 19h</div>
+          <div class="class-title">A oportunidade que muita gente vê, mas quase ninguém entende</div>
+        </div>
+        <div class="class-body">
+          <ul>
+            <li>O que é, de fato, o negócio de vending machines</li>
+            <li>O que não é: por que isso não é mercadinho, nem franquia disfarçada</li>
+            <li>Quanto uma máquina pode faturar</li>
+            <li>Quanto você vai ganhar com uma máquina</li>
+            <li>Investimento e custos iniciais para começar</li>
+            <li>Payback: em quanto tempo o investimento pode se pagar</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="class-card">
+        <div class="class-header">
+          <div class="class-num">AULA 02</div>
+          <div class="class-date">📅 Quarta · 07 MAI · 19h</div>
+          <div class="class-title">Como escolher o ponto, os produtos, a máquina e fazer a gestão</div>
+        </div>
+        <div class="class-body">
+          <ul>
+            <li>Como identificar bons locais usando o método CREFI</li>
+            <li>Como escolher produtos de acordo com o perfil de público</li>
+            <li>Como escolher o modelo de máquina ideal para o ponto</li>
+            <li>Como funciona a negociação de ponto comercial</li>
+            <li>Como usar a telemetria para gerir o negócio à distância</li>
+            <li>Como tocar a operação sem largar seu emprego atual</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="class-card">
+        <div class="class-header">
+          <div class="class-num">AULA 03</div>
+          <div class="class-date">📅 Quinta · 08 MAI · 19h</div>
+          <div class="class-title">O que fazer, o que não fazer e como começar do jeito certo</div>
+        </div>
+        <div class="class-body">
+          <ul>
+            <li>Os erros mais comuns de quem quer entrar nesse mercado</li>
+            <li>O que encurta ou atrasa o retorno do investimento</li>
+            <li>Decisões que fazem diferença já na primeira máquina</li>
+            <li>Perguntas e respostas ao vivo para eliminar dúvidas práticas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-inline-section">
+      <a href="#inscricao" class="cta-btn">GARANTIR MINHA VAGA AGORA <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DOBRA 06 — POR QUE AGORA ==================== -->
+<section class="content alt">
+  <div class="container">
+    <span class="section-kicker">POR QUE OLHAR PARA ISSO AGORA</span>
+    <h2 class="section-title display">Por que tanta gente está olhando para as vending machines como uma das formas mais inteligentes de gerar renda extra hoje?</h2>
+
+    <div class="why-today">
+      <div class="why-card">
+        <span class="n">01</span>
+        <h4>Começa menor do que muitos negócios tradicionais</h4>
+        <p>Você não precisa abrir loja, contratar equipe ou montar estrutura pesada pra validar.</p>
+      </div>
+      <div class="why-card">
+        <span class="n">02</span>
+        <h4>Pode ser operado em paralelo com seu trabalho atual</h4>
+        <p>Com gestão certa e telemetria, você acompanha vendas e desempenho sem estar presente.</p>
+      </div>
+      <div class="why-card">
+        <span class="n">03</span>
+        <h4>É escalável de verdade</h4>
+        <p>Comece com uma máquina e cresça para 2, 3, 5 ou dezenas, conforme sua estratégia.</p>
+      </div>
+      <div class="why-card">
+        <span class="n">04</span>
+        <h4>Tem potencial de retorno rápido</h4>
+        <p>Quando ponto, produto e gestão se encaixam, o investimento pode se pagar em poucos meses.</p>
+      </div>
+      <div class="why-card">
+        <span class="n">05</span>
+        <h4>É mais simples do que parece</h4>
+        <p>O que trava a maioria não é a operação. É não saber como dar o primeiro passo.</p>
+      </div>
+    </div>
+
+    <div class="cta-inline-section">
+      <a href="#inscricao" class="cta-btn">QUERO ME INSCREVER <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DOBRA 07 — PARA QUEM É / NÃO É ==================== -->
+<section class="content">
+  <div class="container">
+    <span class="section-kicker">SEJAMOS DIRETOS</span>
+    <h2 class="section-title display">Investir em vending machines não é pra todo mundo.</h2>
+
+    <div class="fit-grid">
+      <div class="fit-card fit-yes">
+        <span class="badge">✓ PARA QUEM É</span>
+        <h3>Este treinamento é pra você se...</h3>
+        <ul>
+          <li>Quer construir uma renda extra sem depender de mais horas de trabalho</li>
+          <li>Quer empreender com mais inteligência e menos estrutura</li>
+          <li>Já pensa em investir, mas não encontrou um modelo que faça sentido</li>
+          <li>Vê potencial nas vending machines, mas não sabe por onde começar</li>
+          <li>Quer entender o mercado antes de tomar qualquer decisão</li>
+          <li>Quer aprender com alguém que realmente opera máquinas no Brasil</li>
+        </ul>
+      </div>
+
+      <div class="fit-card fit-no">
+        <span class="badge">✕ PARA QUEM NÃO É</span>
+        <h3>Este treinamento NÃO é pra você se...</h3>
+        <ul>
+          <li>Procura dinheiro fácil sem trabalho, critério e gestão</li>
+          <li>Não quer aprender antes de investir</li>
+          <li>Espera uma fórmula mágica sem analisar ponto, produto e operação</li>
+          <li>Quer terceirizar totalmente a responsabilidade do próprio resultado</li>
+          <li>Quer ganhar dinheiro sem trabalhar</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="cta-inline-section">
+      <a href="#inscricao" class="cta-btn">GARANTIR MINHA VAGA AGORA <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DOBRA 08 — PROFESSOR ==================== -->
+<section class="content alt">
+  <div class="container">
+    <span class="section-kicker">CONHEÇA SEU PROFESSOR</span>
+    <h2 class="section-title display">Aprenda com quem vive esse mercado na prática.</h2>
+
+    <div class="prof-wrap" style="margin-top: 44px;">
+      <div class="prof-photo">
+        <img src="images/roberto-araujo.jpg" alt="Roberto Araújo">
+        <div class="prof-tag">Roberto Araújo</div>
+      </div>
+
+      <div>
+        <p class="prof-intro">
+          <strong>Roberto Araújo</strong> atua de forma prática no mercado brasileiro de vending machines. Hoje, opera <strong>dezenas de máquinas</strong> em pontos estratégicos, com faturamento anual superior a <strong>meio milhão de reais</strong> — e construiu essa operação sem abandonar seu emprego principal.
+        </p>
+
+        <p class="prof-intro">
+          Ele não fala como quem observou esse mercado de longe. Fala como quem <strong>investiu, instalou, testou, errou, corrigiu</strong> e continua operando todos os dias.
+        </p>
+
+        <blockquote class="prof-quote">
+          Não é guru de internet. É operador de verdade, que te mostra o painel de vendas, de faturamento e os bastidores reais do negócio.
+        </blockquote>
+
+        <div class="prof-stats">
+          <div class="stat">
+            <div class="num">+7 anos</div>
+            <div class="lbl">de operação com máquinas automáticas</div>
+          </div>
+          <div class="stat">
+            <div class="num">Dezenas</div>
+            <div class="lbl">de máquinas em 2 capitais</div>
+          </div>
+          <div class="stat">
+            <div class="num">+R$ 770k</div>
+            <div class="lbl">por ano de faturamento</div>
+          </div>
+          <div class="stat">
+            <div class="num">CLT</div>
+            <div class="lbl">sem largar o emprego fixo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FINAL CTA ==================== -->
+<section class="final-cta" id="inscricao">
+  <div class="container-narrow">
+    <h2>SUA RENDA EXTRA COMEÇA COM <em>UMA DECISÃO GRATUITA</em>.</h2>
+    <p>Três aulas ao vivo. Um operador real. O suficiente para você entender o negócio, calcular seu cenário e decidir com segurança.</p>
+
+    <div class="form-card">
+      <form onsubmit="event.preventDefault(); document.getElementById('success-msg').style.display='block'; this.style.display='none';">
+        <div class="field">
+          <input type="text" placeholder="Seu nome completo" required>
+        </div>
+        <div class="field">
+          <input type="email" placeholder="Seu melhor e-mail" required>
+        </div>
+        <div class="field">
+          <input type="tel" placeholder="WhatsApp (com DDD)" required>
+        </div>
+        <button type="submit" class="cta-btn">
+          GARANTIR MINHA VAGA <span class="arr">→</span>
+        </button>
+        <div class="safe">🔒 Seus dados estão 100% seguros. Não enviamos spam.</div>
+      </form>
+      <div id="success-msg" style="display:none; padding: 24px; background: rgba(26,127,79,0.15); border: 1px solid rgba(26,127,79,0.4); border-radius: 6px; color: var(--paper);">
+        ✓ Inscrição confirmada! Em breve você receberá o link por e-mail e WhatsApp.
+      </div>
+    </div>
+
+    <div class="final-cta-meta">
+      📅 06, 07 e 08 DE MAIO · 19H · 100% ONLINE E GRATUITO
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="container">
+    <img src="images/logo.png" alt="Roberto Araújo">
+    <div>© 2026 Roberto Araújo · Todos os direitos reservados</div>
+    <div class="legal">
+      Este site não é afiliado ao Facebook, Instagram ou qualquer outra rede social. Os resultados podem variar conforme ponto, produto, gestão e investimento de cada operador.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
